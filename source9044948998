@@ -1,0 +1,523 @@
+local AllowedUsers = {
+    "Kaprao_67",
+    "Goopro_67",
+	"Testhub_one",
+	"",
+	"",
+	"",
+    ""
+}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Username = LocalPlayer.Name 
+local IsAllowed = false
+
+for _, name in pairs(AllowedUsers) do
+    if Username == name then 
+        IsAllowed = true
+        break
+    end
+end
+
+if not IsAllowed then
+    LocalPlayer:Kick("By TEST HUB: ไม่มีสิทธิ์ใช้งานสคริปต์นี้ !")
+    return
+end
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/By-TestHub/Kavo-UI-Library/refs/heads/main/source.lua"))()
+local colors = {
+    SchemeColor = Color3.fromRGB(120, 220, 255),
+    Background = Color3.fromRGB(0, 0, 0),
+    Header = Color3.fromRGB(0, 0, 0),
+    TextColor = Color3.fromRGB(255,255,255),
+    ElementColor = Color3.fromRGB(20, 20, 20)
+}
+local Window = Library.CreateLib("TEST HUB | รวมหลายฟังก์ชันซื้อ", colors)
+local Tab = Window:NewTab("ผู้เล่น")
+local Tab2 = Window:NewTab("บิน")
+local Tab3 = Window:NewTab("เกรียน")
+local Tab4 = Window:NewTab("อธิบาย + ตั้งค่า")
+local Section = Tab:NewSection("ฟังก์ชันผู้เล่น")
+local Section2 = Tab2:NewSection("ฟังก์ชันบิน")
+local Section3 = Tab3:NewSection("ฟังก์ชันเกรียน")
+local Section4 = Tab4:NewSection("สคริปสร้างโดย TEST HUB")
+local fpsLabel = Section4:NewLabel("FPS: กำลังคำนวณ...")
+
+local lastTime = os.clock()
+local frameCount = 0
+
+game:GetService("RunService").RenderStepped:Connect(function()
+    frameCount = frameCount + 1
+    local currentTime = os.clock()
+    
+    if currentTime - lastTime >= 0.3 then
+        local fps = math.floor(frameCount / (currentTime - lastTime))
+        
+        fpsLabel:UpdateLabel("FPS: " .. fps)
+        
+        lastTime = currentTime
+        frameCount = 0
+    end
+end)
+
+Section:NewTextBox("ปรับค่าวิ่งไว", "", function(txt)
+    local speed = tonumber(txt) 
+    if speed then
+        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = speed
+    else
+    end
+end)
+
+Section:NewButton("รีเซ็ตค่าวิ่งเร็วให้เหลือ 16", "", function()
+game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+end)
+
+Section:NewTextBox("ปรับค่ากระโดดสูง", "", function(txt)
+    local jump = tonumber(txt)
+    if jump then
+        local hum = game.Players.LocalPlayer.Character.Humanoid
+        hum.UseJumpPower = true
+        hum.JumpPower = jump
+    else
+    end
+end)
+
+Section:NewButton("รีเซ็ตค่ากระโดดสูงให้เหลือ 50", "", function()
+game.Players.LocalPlayer.Character.Humanoid.JumpPower = 50
+end)
+
+local infiniteJumpActive = false
+local UIS = game:GetService("UserInputService")
+local player = game.Players.LocalPlayer
+
+local function doInfiniteJump()
+    if infiniteJumpActive then
+        local humanoid = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
+    end
+end
+
+UIS.JumpRequest:Connect(doInfiniteJump)
+
+Section:NewToggle("กระโดดได้ไม่จำกัด", "", function(state)
+    infiniteJumpActive = state
+end)
+
+Section2:NewButton("บินแบบ FLY GUI V3 ไม่ทะลุกำแพง", "", function()
+loadstring(game:HttpGet("https://pastebin.com/raw/2RiADZZu"))()
+end)
+
+Section2:NewButton("บินแบบ FLY GUI V3 ทะลุกำแพง ", "", function()
+loadstring(game:HttpGet("https://pastefy.app/syLfCbSr/raw"))()
+end)
+
+Section2:NewButton("บินแบบ FLY GUI V4 ไม่ทะลุกำแพง", "", function()
+loadstring(game:HttpGet("https://pastebin.com/raw/n6Q5TNyg"))()
+end)
+
+Section2:NewButton("บินแบบ FLY GUI V4 ทะลุกำแพง", "", function()
+loadstring(game:HttpGet("https://pastebin.com/raw/ny0pSYMU"))()
+end)
+
+local noclipActive = false
+local runService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+
+local noclipConnection = runService.Stepped:Connect(function()
+    if noclipActive and player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide == true then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+Section:NewToggle("เดินทะลุกำแพง", "", function(state)
+    noclipActive = state
+    
+    if not state and player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = true
+            end
+        end
+    end
+end)
+
+Section:NewButton("หายตัว", "", function()
+loadstring(game:HttpGet("https://pastebin.com/raw/dphHq47G"))()
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local player = Players.LocalPlayer
+
+local flying = false
+local noclipMode = false 
+local speed = 80 
+local bv, bg
+
+local function toggleFly(state, noclip)
+    flying = state
+    noclipMode = noclip
+    local character = player.Character
+    if not character then return end
+    
+    local root = character:FindFirstChild("HumanoidRootPart")
+    local hum = character:FindFirstChild("Humanoid")
+    
+    if flying and root and hum then
+        bv = Instance.new("BodyVelocity", root)
+        bv.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+        bv.Velocity = Vector3.zero
+        
+        bg = Instance.new("BodyGyro", root)
+        bg.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+        bg.P = 10000
+        bg.D = 100
+        bg.CFrame = root.CFrame
+        
+        hum.PlatformStand = true
+    else
+        if bv then bv:Destroy() end
+        if bg then bg:Destroy() end
+        if hum then hum.PlatformStand = false end
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    if flying and player.Character then
+        local root = player.Character:FindFirstChild("HumanoidRootPart")
+        local hum = player.Character:FindFirstChild("Humanoid")
+        local cam = workspace.CurrentCamera
+        
+        if root and hum and bv and bg then
+            local moveDir = hum.MoveDirection
+            if moveDir.Magnitude > 0 then
+                local camLook = cam.CFrame.LookVector
+                local flatLook = Vector3.new(camLook.X, 0, camLook.Z).Unit
+                local camRight = cam.CFrame.RightVector
+                local flatRight = Vector3.new(camRight.X, 0, camRight.Z).Unit
+                
+                local forwardIntent = moveDir:Dot(flatLook)
+                local rightIntent = moveDir:Dot(flatRight)
+                local flyDir = (cam.CFrame.LookVector * forwardIntent) + (cam.CFrame.RightVector * rightIntent)
+                bv.Velocity = flyDir * speed 
+            else
+                bv.Velocity = Vector3.zero
+            end
+            bg.CFrame = cam.CFrame
+        end
+    end
+end)
+
+RunService.Stepped:Connect(function()
+    if flying and noclipMode and player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then part.CanCollide = false end
+        end
+    end
+end)
+
+Section2:NewToggle("บินแบบปกติไม่ทะลุกำแพง", "", function(state)
+    toggleFly(state, false)
+end)
+
+Section2:NewToggle("บินแบบปกติทะลุกำแพง", "", function(state)
+    toggleFly(state, true)
+end)
+
+Section2:NewTextBox("ปรับความเร็วบินแบบปกติ", "" .. speed, function(txt)
+    local s = tonumber(txt)
+    if s then 
+        speed = s 
+    end
+end)
+
+local vehicleFlyActive = false
+local vehicleSpeed = 80 
+local vBV, vBG
+
+RunService.RenderStepped:Connect(function()
+    local char = player.Character
+    local hum = char and char:FindFirstChild("Humanoid")
+
+    if vehicleFlyActive and hum and hum.SeatPart then
+        local seat = hum.SeatPart
+        
+        if not vBV or vBV.Parent ~= seat then
+            if vBV then vBV:Destroy() end
+            vBV = Instance.new("BodyVelocity")
+            vBV.MaxForce = Vector3.new(1e9, 1e9, 1e9)
+            vBV.Parent = seat
+        end
+        
+        if not vBG or vBG.Parent ~= seat then
+            if vBG then vBG:Destroy() end
+            vBG = Instance.new("BodyGyro")
+            vBG.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+            vBG.P = 10000
+            vBG.D = 100
+            vBG.Parent = seat
+        end
+        
+        local cam = workspace.CurrentCamera
+        local moveDir = hum.MoveDirection
+        
+        if moveDir.Magnitude > 0 then
+            local camLook = cam.CFrame.LookVector
+            local flatLook = Vector3.new(camLook.X, 0, camLook.Z)
+            if flatLook.Magnitude > 0 then flatLook = flatLook.Unit else flatLook = Vector3.new(0, 0, -1) end
+            
+            local camRight = cam.CFrame.RightVector
+            local flatRight = Vector3.new(camRight.X, 0, camRight.Z)
+            if flatRight.Magnitude > 0 then flatRight = flatRight.Unit else flatRight = Vector3.new(1, 0, 0) end
+            
+            local forwardIntent = moveDir:Dot(flatLook)
+            local rightIntent = moveDir:Dot(flatRight)
+            
+            local flyDir = (cam.CFrame.LookVector * forwardIntent) + (cam.CFrame.RightVector * rightIntent)
+            vBV.Velocity = flyDir * vehicleSpeed
+        else
+            vBV.Velocity = Vector3.zero
+        end
+        vBG.CFrame = cam.CFrame
+        
+    else
+        if vBV then vBV:Destroy(); vBV = nil end
+        if vBG then vBG:Destroy(); vBG = nil end
+    end
+end)
+
+Section2:NewToggle("บินไปพร้อมรถ (ต้องนั่งเป็นคนขับก่อนถึงจะบิน)", "", function(state)
+    vehicleFlyActive = state
+end)
+
+Section2:NewTextBox("ปรับค่าความเร็วบินไปพร้อมรถ", "", function(txt)
+    local speed = tonumber(txt)
+    if speed then
+        vehicleSpeed = speed
+    else
+    end
+end)
+
+local player = game.Players.LocalPlayer
+local runService = game:GetService("RunService")
+
+local flingActive = false
+local spinSpeed = 100000 
+runService.Heartbeat:Connect(function()
+    if flingActive and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+        local root = player.Character.HumanoidRootPart
+        local hum = player.Character:FindFirstChildOfClass("Humanoid")
+        local oldRotVel = root.RotVelocity
+        root.RotVelocity = Vector3.new(0, spinSpeed, 0)
+        
+        runService.RenderStepped:Wait()
+        root.RotVelocity = oldRotVel
+        if hum then
+            if hum:GetState() == Enum.HumanoidStateType.FallingDown or hum:GetState() == Enum.HumanoidStateType.Ragdoll then
+                hum:ChangeState(Enum.HumanoidStateType.GettingUp)
+            end
+        end
+    end
+end)
+
+Section3:NewButton("เสกของ", "", function()
+loadstring(game:HttpGet("https://pastebin.com/raw/Qg6mDRV2"))()
+end)
+
+Section3:NewButton("ชักว่าว R6", "", function()
+loadstring(game:HttpGet("https://pastefy.app/3q0ZUYSV/raw"))()
+end)
+
+Section3:NewToggle("เดินชนกระเด็น (ใช้ได้สำหรับแมพที่เดินชนกันได้เท่านั้น)", "", function(state)
+    flingActive = state
+    if state then
+    else
+    end
+end)
+
+local Players = game:GetService("Players")
+local Player = Players.LocalPlayer
+local runService = game:GetService("RunService")
+
+local flingActive = false
+local AllBool = true 
+getgenv().OldPos = nil 
+
+local Message = function(_Title, _Text, Time)
+    game:GetService("StarterGui"):SetCore("SendNotification", {Title = _Title, Text = _Text, Duration = Time})
+end
+
+local SkidFling = function(TargetPlayer)
+    if not flingActive then return end
+    
+    local Character = Player.Character
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+    local RootPart = Humanoid and Humanoid.RootPart
+
+    local TCharacter = TargetPlayer.Character
+    local THumanoid = TCharacter and TCharacter:FindFirstChildOfClass("Humanoid")
+    local TRootPart = THumanoid and THumanoid.RootPart
+    local THead = TCharacter and TCharacter:FindFirstChild("Head")
+
+    if Character and Humanoid and RootPart and TCharacter and TCharacter:FindFirstChildWhichIsA("BasePart") then
+
+        if THead then workspace.CurrentCamera.CameraSubject = THead end
+        
+        local FPos = function(BasePart, Pos, Ang)
+            if not flingActive then return end
+            RootPart.CFrame = CFrame.new(BasePart.Position) * Pos * Ang
+            Character:SetPrimaryPartCFrame(CFrame.new(BasePart.Position) * Pos * Ang)
+            RootPart.Velocity = Vector3.new(9e7, 9e7 * 10, 9e7)
+            RootPart.RotVelocity = Vector3.new(9e8, 9e8, 9e8)
+        end
+        
+        local SFBasePart = function(BasePart)
+            local TimeToWait = 1.5 
+            local Time = tick()
+            local Angle = 0
+
+            repeat
+                if RootPart and THumanoid and flingActive then
+                    Angle = Angle + 100
+                    FPos(BasePart, CFrame.new(0, 1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle),0 ,0))
+                    task.wait()
+                    FPos(BasePart, CFrame.new(0, -1.5, 0) + THumanoid.MoveDirection * BasePart.Velocity.Magnitude / 1.25, CFrame.Angles(math.rad(Angle), 0, 0))
+                    task.wait()
+                else
+                    break
+                end
+            until not flingActive or BasePart.Velocity.Magnitude > 250 or BasePart.Parent ~= TargetPlayer.Character or TargetPlayer.Parent ~= Players or THumanoid.Sit or Humanoid.Health <= 0 or tick() > Time + TimeToWait
+        end
+
+        workspace.FallenPartsDestroyHeight = 0/0
+        local BV = Instance.new("BodyVelocity")
+        BV.Name = "EpixVel"
+        BV.Parent = RootPart
+        BV.Velocity = Vector3.new(9e8, 9e8, 9e8)
+        BV.MaxForce = Vector3.new(1/0, 1/0, 1/0)
+        
+        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, false)
+        
+        if TRootPart then
+            SFBasePart(TRootPart)
+        elseif THead then
+            SFBasePart(THead)
+        end
+    
+        BV:Destroy()
+        Humanoid:SetStateEnabled(Enum.HumanoidStateType.Seated, true)
+        workspace.CurrentCamera.CameraSubject = Humanoid
+    end
+end
+
+task.spawn(function()
+    while true do
+        task.wait(0.05)
+        if flingActive then
+            for _, x in next, Players:GetPlayers() do
+                if x ~= Player and flingActive then
+                    SkidFling(x)
+                end
+            end
+        end
+    end
+end)
+
+Section3:NewToggle("วาปกระเด็นทุกคนในแมพ (ใช้ได้สำหรับแมพที่เดินชนกันได้เท่านั้น)", "", function(state)
+    flingActive = state
+    
+    local Character = Player.Character
+    local Humanoid = Character and Character:FindFirstChildOfClass("Humanoid")
+    local RootPart = Humanoid and Humanoid.RootPart
+
+    if state then
+        if RootPart then
+            getgenv().OldPos = RootPart.CFrame
+            getgenv().FPDH = workspace.FallenPartsDestroyHeight
+        end
+    else
+        flingActive = false
+        task.wait(0.05) 
+        
+        if RootPart and getgenv().OldPos then
+            repeat
+                RootPart.CFrame = getgenv().OldPos
+                Character:SetPrimaryPartCFrame(getgenv().OldPos)
+                if Humanoid then Humanoid:ChangeState(Enum.HumanoidStateType.GettingUp) end
+                for _, part in next, Character:GetChildren() do
+                    if part:IsA("BasePart") then
+                        part.Velocity = Vector3.new(0, 0, 0)
+                        part.RotVelocity = Vector3.new(0, 0, 0)
+                    end
+                end
+                task.wait()
+            until (RootPart.Position - getgenv().OldPos.p).Magnitude < 5
+            if getgenv().FPDH then workspace.FallenPartsDestroyHeight = getgenv().FPDH end
+        end
+    end
+end)
+
+Section4:NewButton("คัดลอกลิงค์ Discord", "คัดลอกลิงค์กลุ่ม Discord ไว้ในคลิปบอร์ด", function()
+    if setclipboard then
+        setclipboard("https://discord.gg/Ttwq9Udwhc")
+    elseif syn and syn.write_clipboard then
+        syn.write_clipboard("https://discord.gg/Ttwq9Udwhc")
+    else
+    end
+
+    game:GetService("StarterGui"):SetCore("SendNotification", { 
+        Title = "คัดลอกสำเร็จ";
+        Text = "คัดลอกลิงค์ Discord แล้ว";
+        Duration = 5;
+    })
+end)
+
+Section4:NewButton("กันหลุดหาก AFK เกิน 20 นาทีจะไม่หลุด", "", function()
+local VirtualUser = game:GetService("VirtualUser")
+game:GetService("Players").LocalPlayer.Idled:Connect(function()
+    VirtualUser:CaptureController()
+    VirtualUser:ClickButton2(Vector2.new())
+
+    end)
+end)
+
+Section4:NewButton("บูส FPS ลดแสงมาก", "", function()
+    local decalsye = true
+    local g = game
+    local w = g.Workspace
+    local l = g.Lighting
+    local t = w.Terrain
+    t.WaterWaveSize = 0
+    t.WaterWaveSpeed = 0
+    t.WaterReflectance = 0
+    t.WaterTransparency = 0
+    l.GlobalShadows = false
+    l.FogEnd = 9e9
+    l.Brightness = 0
+    for i, v in pairs(w:GetDescendants()) do
+        if v:IsA("Decal") or v:IsA("Texture") then v.Transparency = 1 end
+    end
+end)
+
+Section4:NewButton("บูส FPS ลดแสงนิด", "", function()
+    local g = game
+    local l = g.Lighting
+    l.GlobalShadows = true
+    l.Brightness = 1
+    l.FogEnd = 10000
+end)
+
+Section4:NewButton("บูส FPS ภาพเดิม", "", function()
+    local g = game
+    local l = g.Lighting
+    l.GlobalShadows = true
+    l.Brightness = 2
+    l.FogEnd = 100000
+end)
