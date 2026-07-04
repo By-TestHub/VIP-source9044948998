@@ -25,6 +25,33 @@ if not IsAllowed then
     return
 end
 
+local AllowedUsers = {
+    "Kaprao_67",
+    "Goopro_67",
+	"Testhub_one",
+	"",
+	"",
+	"",
+    ""
+}
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Username = LocalPlayer.Name 
+local IsAllowed = false
+
+for _, name in pairs(AllowedUsers) do
+    if Username == name then 
+        IsAllowed = true
+        break
+    end
+end
+
+if not IsAllowed then
+    LocalPlayer:Kick("By TEST HUB: คุณไม่มีสิทธิ์ใช้งานสคริปต์นี้ !")
+    return
+end
+
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/By-TestHub/Kavo-UI-Library/refs/heads/main/source.lua"))()
 local colors = {
     SchemeColor = Color3.fromRGB(120, 220, 255),
@@ -590,17 +617,60 @@ Section4:NewButton("คัดลอกลิงค์ Discord", "คัดลอ
 end)
 
 Section4:NewButton("กันหลุดหาก AFK เกิน 20 นาทีจะไม่หลุด", "", function()
-local VirtualUser = game:GetService("VirtualUser")
-game:GetService("Players").LocalPlayer.Idled:Connect(function()
-    VirtualUser:CaptureController()
-    VirtualUser:ClickButton2(Vector2.new())
-    game:GetService("StarterGui"):SetCore("SendNotification", { 
-        Title = "AFK";
-        Text = "กันเด้งออกสำเร็จ";
-        Duration = 5;
-    })
-end)
+    local function ShowCustomNotify(title, text)
+        local plrgui = (gethui and gethui()) or game.Players.LocalPlayer:WaitForChild("PlayerGui")
+        
+        local notifyGui = Instance.new("ScreenGui")
+        notifyGui.Name = "CustomAFKNotify"
+        notifyGui.Parent = plrgui
+        
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(0, 220, 0, 70)
+        frame.Position = UDim2.new(1, -240, 1, -90)
+        frame.BackgroundColor3 = Color3.fromRGB(25., 25, 25)
+        frame.BackgroundTransparency = 0.1
+        frame.BorderSizePixel = 0
+        frame.Parent = notifyGui
+        
+        local uiCorner = Instance.new("UICorner")
+        uiCorner.CornerRadius = UDim.new(0, 8)
+        uiCorner.Parent = frame
+        
+        local titleLabel = Instance.new("TextLabel")
+        titleLabel.Size = UDim2.new(1, -20, 0, 25)
+        titleLabel.Position = UDim2.new(0, 10, 0, 5)
+        titleLabel.Text = title
+        titleLabel.TextColor3 = Color3.fromRGB(120, 220, 255) 
+        titleLabel.TextSize = 15
+        titleLabel.Font = Enum.Font.SourceSansBold
+        titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+        titleLabel.BackgroundTransparency = 1
+        titleLabel.Parent = frame
+        
+        local textLabel = Instance.new("TextLabel")
+        textLabel.Size = UDim2.new(1, -20, 0, 30)
+        textLabel.Position = UDim2.new(0, 10, 0, 30)
+        textLabel.Text = text
+        textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        textLabel.TextSize = 14
+        textLabel.Font = Enum.Font.SourceSans
+        textLabel.TextXAlignment = Enum.TextXAlignment.Left
+        textLabel.BackgroundTransparency = 1
+        textLabel.Parent = frame
+        
+        task.delay(5, function()
+            notifyGui:Destroy()
+        end)
+    end
+
+    local VirtualUser = game:GetService("VirtualUser")
+    game:GetService("Players").LocalPlayer.Idled:Connect(function()
+        VirtualUser:CaptureController()
+        VirtualUser:ClickButton2(Vector2.new())
+        
     end)
+    
+    ShowCustomNotify("AFK","เปิดโหมด AFK แล้วจะไม่เด้งออก")
 end)
 
 Section4:NewButton("บูส FPS ลดแสงมาก", "", function()
