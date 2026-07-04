@@ -25,33 +25,6 @@ if not IsAllowed then
     return
 end
 
-local AllowedUsers = {
-    "Kaprao_67",
-    "Goopro_67",
-	"Testhub_one",
-	"",
-	"",
-	"",
-    ""
-}
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Username = LocalPlayer.Name 
-local IsAllowed = false
-
-for _, name in pairs(AllowedUsers) do
-    if Username == name then 
-        IsAllowed = true
-        break
-    end
-end
-
-if not IsAllowed then
-    LocalPlayer:Kick("By TEST HUB: คุณไม่มีสิทธิ์ใช้งานสคริปต์นี้ !")
-    return
-end
-
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/By-TestHub/Kavo-UI-Library/refs/heads/main/source.lua"))()
 local colors = {
     SchemeColor = Color3.fromRGB(120, 220, 255),
