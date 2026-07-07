@@ -61,34 +61,37 @@ local function createToggleButton(imageAsset, callback)
     local frame = Instance.new("Frame", gui)
     frame.Size = UDim2.new(0, 35, 0, 35)
     frame.Position = UDim2.new(0, 20, 0, 150)
-    frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    frame.BackgroundTransparency = 0.3
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.1
     frame.Active = true
     
     local corner = Instance.new("UICorner", frame)
-    corner.CornerRadius = UDim.new(0, 6) 
-    
-    local stroke = Instance.new("UIStroke", frame)
-    stroke.Color = Color3.fromRGB(120, 220, 255)
-    stroke.Thickness = 1.5
+    corner.CornerRadius = UDim.new(0, 8) 
     
     local btn = Instance.new("ImageButton", frame)
-    btn.Size = UDim2.new(1, 0, 1, 0)
+    btn.Size = UDim2.new(0, 23, 0, 23)
+    btn.Position = UDim2.new(0, 6, 0, 6)
     btn.BackgroundTransparency = 1
     btn.Image = imageAsset
     
     local dragging, dragStart, startPos
-    frame.InputBegan:Connect(function(input)
+    local hasDragged = false
+    
+    btn.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = frame.Position
+            hasDragged = false
         end
     end)
 
     game:GetService("UserInputService").InputChanged:Connect(function(input)
         if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
+            if delta.Magnitude > 7 then
+                hasDragged = true
+            end
             frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
@@ -100,7 +103,9 @@ local function createToggleButton(imageAsset, callback)
     end)
 
     btn.Activated:Connect(function()
-        callback()
+        if not hasDragged then
+            callback()
+        end
     end)
     
     getgenv().OpenGuiButton = gui
@@ -114,6 +119,7 @@ createToggleButton("rbxassetid://117649776522765", function()
         game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
     end
 end)
+
 
 local Tab = Window:NewTab("ผู้เล่น")
 local Tab2 = Window:NewTab("บิน")
