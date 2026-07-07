@@ -25,9 +25,6 @@ if not IsAllowed then
     return
 end
 
--- ==========================================
--- [ 1. โหลด Kavo UI Library และตั้งค่าธีม ]
--- ==========================================
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/By-TestHub/Kavo-UI-Library/refs/heads/main/source.lua"))()
 local colors = {
     SchemeColor = Color3.fromRGB(120, 220, 255),
@@ -38,25 +35,12 @@ local colors = {
 }
 local Window = Library.CreateLib("TEST HUB | รวมหลายฟังก์ชันซื้อ", colors)
 
--- สร้างหน้าต่างแท็บตัวอย่างไว้ให้ (กะเพราเอาปุ่มฟังก์ชันซื้อหรือโปรไปใส่เพิ่มตรงนี้ได้เลย)
-local MainTab = Window:NewTab("หน้าแรก")
-local MainSection = MainTab:NewSection("ฟังก์ชันหลัก")
-
-MainSection:NewButton("ตัวอย่างปุ่มฟังก์ชัน", "คำอธิบาย", function()
-    print("กะเพราเปิดใช้งานสคริปต์เรียบร้อย!")
-end)
-
--- ==========================================
--- [ 2. ระบบค้นหาหน้าต่าง UI (เสถียรพิเศษบนมือถือ) ]
--- ==========================================
 local function GetKavoGui()
-    -- ค้นหาใน CoreGui ก่อนเป็นอันดับแรก
     for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
         if v:IsA("ScreenGui") and (v:FindFirstChild("Main") or v.Name == "Kavo") then 
             return v
         end
     end
-    -- ค้นหาใน PlayerGui สำรอง (เผื่อรันบนเอ็กซีคิวเตอร์มือถือบางตัวที่สิทธิ์เข้าไม่ถึง CoreGui)
     for _, v in pairs(game.Players.LocalPlayer:WaitForChild("PlayerGui"):GetChildren()) do
         if v:IsA("ScreenGui") and (v:FindFirstChild("Main") or v.Name == "Kavo") then 
             return v
@@ -65,11 +49,7 @@ local function GetKavoGui()
     return nil
 end
 
--- ==========================================
--- [ 3. ระบบสร้างปุ่มเปิด-ปิด ทัชสกรีนลื่นๆ ]
--- ==========================================
 local function createToggleButton(imageAsset, callback)
-    -- ลบปุ่มเก่าออกก่อนถ้ามีการรันสคริปต์ซ้ำ กันบัคปุ่มซ้อน
     if getgenv().OpenGuiButton then getgenv().OpenGuiButton:Destroy() end
     
     local gui = Instance.new("ScreenGui")
@@ -79,27 +59,24 @@ local function createToggleButton(imageAsset, callback)
     gui.ResetOnSpawn = false
     
     local frame = Instance.new("Frame", gui)
-    frame.Size = UDim2.fromOffset(52, 52) -- ปรับขนาดเป็น 52px พอดีนิ้วสัมผัส ไม่เล็กเกินไปสำหรับจอมือถือ
-    frame.Position = UDim2.new(0, 20, 0, 150) -- พิกัดเริ่มต้นของปุ่มลอย
+    frame.Size = UDim2.new(0, 35, 0, 35)
+    frame.Position = UDim2.new(0, 20, 0, 150)
     frame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    frame.BackgroundTransparency = 0.2
+    frame.BackgroundTransparency = 0.3
     frame.Active = true
     
     local corner = Instance.new("UICorner", frame)
-    corner.CornerRadius = UDim.new(0.5, 0) -- ทำปุ่มทรงกลม
+    corner.CornerRadius = UDim.new(0, 6) 
     
-    -- เพิ่มเส้นขอบเรืองแสงสีฟ้าให้เข้ากับธีมหลัก
     local stroke = Instance.new("UIStroke", frame)
     stroke.Color = Color3.fromRGB(120, 220, 255)
-    stroke.Thickness = 2
+    stroke.Thickness = 1.5
     
     local btn = Instance.new("ImageButton", frame)
-    btn.Size = UDim2.new(0.7, 0, 0.7, 0)
-    btn.Position = UDim2.new(0.15, 0, 0.15, 0)
+    btn.Size = UDim2.new(1, 0, 1, 0)
     btn.BackgroundTransparency = 1
     btn.Image = imageAsset
     
-    -- ระบบลากปุ่ม (Drag) ที่สมบูรณ์แบบ แตะแยกน้ำหนักระหว่าง "ลาก" กับ "กด"
     local dragging, dragStart, startPos
     frame.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
@@ -122,7 +99,6 @@ local function createToggleButton(imageAsset, callback)
         end
     end)
 
-    -- [แก้บัคมือถือ]: ใช้ Activated มั่นใจได้ว่าแตะปุ๊บหน้าต่าง UI สลับสถานะเปิด-ปิดทันที 100%
     btn.Activated:Connect(function()
         callback()
     end)
@@ -130,19 +106,14 @@ local function createToggleButton(imageAsset, callback)
     getgenv().OpenGuiButton = gui
 end
 
--- ==========================================
--- [ 4. สั่งรันระบบปุ่มกดสลับการทำงาน ]
--- ==========================================
 createToggleButton("rbxassetid://117649776522765", function()
     local kavoGui = GetKavoGui()
     if kavoGui then
         kavoGui.Enabled = not kavoGui.Enabled
     else
-        -- ระบบสำรอง: หากโหลด UI ช้ากว่าปุ่ม ให้ส่งคีย์โค้ดไปเปิดหน้าต่างแทน
         game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
     end
 end)
-
 
 local Tab = Window:NewTab("ผู้เล่น")
 local Tab2 = Window:NewTab("บิน")
