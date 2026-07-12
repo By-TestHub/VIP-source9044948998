@@ -517,7 +517,7 @@ task.spawn(function()
     end
 end)
 
-Section3:NewToggle("วาปกระเด็นทุกคนในแมพ (ใช้ได้สำหรับแมพที่เดินชนกันได้เท่านั้น)", "", function(state)
+Section3:NewToggle("วาร์ปกระเด็นทุกคนในแมพ (ใช้ได้สำหรับแมพที่เดินชนกันได้เท่านั้น)", "", function(state)
     flingActive = state
     
     local Character = Player.Character
